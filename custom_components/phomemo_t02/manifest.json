@@ -1,0 +1,18 @@
+{
+  "domain": "phomemo_t02",
+  "name": "Phomemo T02",
+  "version": "0.1.0",
+  "documentation": "https://github.com/alexduboiz/ha-phomemo-t02",
+  "issue_tracker": "https://github.com/alexduboiz/ha-phomemo-t02/issues",
+  "codeowners": ["@alexduboiz"],
+  "config_flow": true,
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "dependencies": ["bluetooth_adapters"],
+  "bluetooth": [
+    {
+      "local_name": "T02"
+    }
+  ],
+  "requirements": ["imagespec==0.4.0", "bleak-retry-connector>=3.5.0"]
+}

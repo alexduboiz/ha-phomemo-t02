@@ -1,0 +1,119 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "confirm": {
+        "title": "Add Phomemo T02",
+        "description": "Set up the Phomemo T02 at {address}?\n\nThe printer must be powered on to print. It sleeps to save battery, and Home Assistant cannot wake it."
+      },
+      "user": {
+        "title": "Add Phomemo T02",
+        "description": "Choose the printer to add. It must be switched on to appear here.",
+        "data": {
+          "address": "Printer"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This printer is already set up.",
+      "no_devices_found": "No Phomemo T02 was found. Switch the printer on and make sure it is in range of a Bluetooth adapter, or of an ESPHome proxy with active connections enabled."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Bluetooth tuning",
+        "description": "Defaults suit a local Bluetooth adapter. If prints come out garbled or time out over an ESPHome proxy, lower the chunk size or raise the delay.",
+        "data": {
+          "chunk_size": "Maximum bytes per write",
+          "chunk_delay_ms": "Delay between writes (ms)",
+          "idle_disconnect_s": "Disconnect after idle (seconds)"
+        },
+        "data_description": {
+          "chunk_size": "Capped automatically at the negotiated MTU minus 3.",
+          "chunk_delay_ms": "Raise this first if prints are garbled.",
+          "idle_disconnect_s": "Frees a connection slot on the Bluetooth proxy between prints."
+        }
+      }
+    }
+  },
+  "entity": {
+    "text": {
+      "label_text": { "name": "Label text" },
+      "label_qr": { "name": "QR data" }
+    },
+    "select": {
+      "font_size": {
+        "name": "Font size",
+        "state": {
+          "Small": "Small",
+          "Medium": "Medium",
+          "Large": "Large",
+          "Extra large": "Extra large"
+        }
+      },
+      "align": {
+        "name": "Justification",
+        "state": {
+          "left": "Left",
+          "center": "Centre",
+          "right": "Right"
+        }
+      }
+    },
+    "number": {
+      "copies": { "name": "Copies" }
+    },
+    "image": {
+      "preview": { "name": "Label preview" }
+    },
+    "button": {
+      "print_label": { "name": "Print label" },
+      "test_print": { "name": "Test print" },
+      "feed": { "name": "Feed paper" }
+    },
+    "notify": {
+      "notify": { "name": "Print notification" }
+    }
+  },
+  "services": {
+    "print": {
+      "name": "Print",
+      "description": "Render an imagespec payload and print it.",
+      "fields": {
+        "payload": { "name": "Payload", "description": "List of imagespec drawing elements." },
+        "height": { "name": "Height", "description": "Fixed height in dots; omit to auto-crop." },
+        "dither": { "name": "Dither", "description": "Floyd-Steinberg dithering for photos." },
+        "copies": { "name": "Copies", "description": "How many times to print." }
+      }
+    },
+    "print_text": {
+      "name": "Print text",
+      "description": "Print a line of text, word-wrapped to the paper width.",
+      "fields": {
+        "text": { "name": "Text", "description": "The text to print." },
+        "size": { "name": "Size", "description": "Starting font size." },
+        "align": { "name": "Alignment", "description": "Horizontal justification." },
+        "copies": { "name": "Copies", "description": "How many times to print." }
+      }
+    },
+    "print_qr": {
+      "name": "Print QR code",
+      "description": "Print a QR code with an optional caption.",
+      "fields": {
+        "data": { "name": "Data", "description": "String encoded into the QR code." },
+        "caption": { "name": "Caption", "description": "Optional text below the code." },
+        "size": { "name": "Caption size", "description": "Starting font size." },
+        "align": { "name": "Caption alignment", "description": "Horizontal justification." },
+        "copies": { "name": "Copies", "description": "How many times to print." }
+      }
+    },
+    "feed": {
+      "name": "Feed paper",
+      "description": "Advance the paper.",
+      "fields": {
+        "lines": { "name": "Lines", "description": "Dot lines to advance (8 = 1 mm)." }
+      }
+    }
+  }
+}

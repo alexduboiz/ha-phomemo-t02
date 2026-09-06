@@ -1,0 +1,164 @@
+print:
+  name: Print
+  description: >-
+    Render an imagespec payload and print it. This is the general-purpose action
+    used by the Grocy webhook and other automations.
+  target:
+    device:
+      integration: phomemo_t02
+  fields:
+    payload:
+      name: Payload
+      description: >-
+        A list of imagespec drawing elements. Use text_fit for label text, never
+        text_box, which draws a filled badge that prints as a black slab.
+      required: true
+      example: |
+        - type: qrcode
+          data: "grocy:p:42"
+          x: 100
+          y: 8
+          boxsize: 8
+        - type: text_fit
+          value: "Coffee beans"
+          x: 8
+          y: 200
+          width: 368
+          height: 90
+          size: 34
+          align: center
+      selector:
+        object:
+    height:
+      name: Height
+      description: >-
+        Fixed label height in dots (8 dots = 1 mm). Omit to crop automatically to
+        the content, which is usually what you want.
+      required: false
+      example: 300
+      selector:
+        number:
+          min: 8
+          max: 4000
+          unit_of_measurement: dots
+          mode: box
+    dither:
+      name: Dither
+      description: Floyd-Steinberg dithering. Useful for photos, not for text or QR codes.
+      required: false
+      default: false
+      selector:
+        boolean:
+    copies:
+      name: Copies
+      description: How many times to print the label.
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+
+print_text:
+  name: Print text
+  description: Print a line of text, word-wrapped to the paper width.
+  target:
+    device:
+      integration: phomemo_t02
+  fields:
+    text:
+      name: Text
+      description: The text to print. It wraps and shrinks to fit.
+      required: true
+      example: Bin day is tomorrow
+      selector:
+        text:
+          multiline: true
+    size:
+      name: Size
+      description: Starting font size; shrinks automatically if the text does not fit.
+      required: false
+      default: Large
+      selector:
+        select:
+          options: [Small, Medium, Large, Extra large]
+    align:
+      name: Alignment
+      required: false
+      default: center
+      selector:
+        select:
+          options: [left, center, right]
+    copies:
+      name: Copies
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+
+print_qr:
+  name: Print QR code
+  description: Print a QR code with an optional caption underneath.
+  target:
+    device:
+      integration: phomemo_t02
+  fields:
+    data:
+      name: Data
+      description: The string encoded into the QR code.
+      required: true
+      example: "grocy:p:42"
+      selector:
+        text:
+    caption:
+      name: Caption
+      description: Optional text printed below the code.
+      required: false
+      example: Coffee beans
+      selector:
+        text:
+    size:
+      name: Caption size
+      required: false
+      default: Large
+      selector:
+        select:
+          options: [Small, Medium, Large, Extra large]
+    align:
+      name: Caption alignment
+      required: false
+      default: center
+      selector:
+        select:
+          options: [left, center, right]
+    copies:
+      name: Copies
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+
+feed:
+  name: Feed paper
+  description: Advance the paper, for example to make a label easier to tear off.
+  target:
+    device:
+      integration: phomemo_t02
+  fields:
+    lines:
+      name: Lines
+      description: Number of dot lines to advance (8 lines = 1 mm).
+      required: false
+      default: 3
+      selector:
+        number:
+          min: 1
+          max: 255
+          mode: box

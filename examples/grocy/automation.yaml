@@ -1,0 +1,64 @@
+- alias: Grocy - print label on the Phomemo T02
+  id: grocy_phomemo_label
+  description: >-
+    Receives Grocy's label printer webhook and prints a grocycode QR with the
+    product name underneath.
+  mode: queued
+  max: 10
+  triggers:
+    - trigger: webhook
+      webhook_id: phomemo_grocy_label
+      allowed_methods: [POST]
+      local_only: true
+  conditions:
+    # Ignore malformed posts rather than printing a blank label.
+    - condition: template
+      value_template: "{{ trigger.json.grocycode is defined and trigger.json.grocycode }}"
+  actions:
+    - action: phomemo_t02.print_qr
+      data:
+        data: "{{ trigger.json.grocycode }}"
+        caption: "{{ trigger.json.product | default('', true) }}"
+        size: Medium
+        align: center
+
+# ---------------------------------------------------------------------------
+# Alternative: full control over the layout.
+#
+# print_qr centres the code and caption for you. Use phomemo_t02.print instead
+# when you want to place elements yourself -- for example to add the due date.
+#
+#  actions:
+#    - action: phomemo_t02.print
+#      data:
+#        payload:
+#          - type: qrcode
+#            data: "{{ trigger.json.grocycode }}"
+#            x: 100
+#            y: 8
+#            boxsize: 8
+#            eclevel: m
+#          - type: text_fit
+#            value: "{{ trigger.json.product }}"
+#            x: 8
+#            y: 200
+#            width: 368
+#            height: 80
+#            size: 34
+#            min_size: 16
+#            max_lines: 2
+#            align: center
+#            valign: top
+#            fit: shrink
+#          - type: text_fit
+#            value: "{{ trigger.json.due_date | default('', true) }}"
+#            x: 8
+#            y: 285
+#            width: 368
+#            height: 30
+#            size: 20
+#            max_lines: 1
+#            align: center
+#
+# Use text_fit, never text_box: text_box draws a filled badge with inverted
+# text, which the printer renders as a solid black slab.

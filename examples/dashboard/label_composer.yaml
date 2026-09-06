@@ -1,0 +1,63 @@
+# Phomemo T02 label composer card.
+#
+# Paste into a dashboard: Edit dashboard -> Add card -> Manual, then replace the
+# YAML with this. No custom cards or HACS frontend resources are needed.
+#
+# If your entity IDs differ (a second printer, or a renamed device), adjust the
+# suffixes below -- the prefixes follow the device name Home Assistant assigned.
+
+type: vertical-stack
+cards:
+  # The preview is the exact bitmap that will be printed, at 384 dots wide.
+  - type: picture-entity
+    entity: image.phomemo_t02_label_preview
+    name: Label preview
+    show_state: false
+    show_name: true
+    camera_view: auto
+    fit_mode: contain
+    tap_action:
+      action: none
+
+  - type: entities
+    title: Compose
+    show_header_toggle: false
+    entities:
+      - entity: text.phomemo_t02_label_text
+        name: Text
+      - entity: text.phomemo_t02_label_qr
+        name: QR data
+      - entity: select.phomemo_t02_font_size
+        name: Size
+      - entity: select.phomemo_t02_justification
+        name: Justify
+      - entity: number.phomemo_t02_copies
+        name: Copies
+      - type: attribute
+        entity: image.phomemo_t02_label_preview
+        attribute: paper_mm
+        name: Paper needed
+        suffix: " mm"
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        entity: button.phomemo_t02_print_label
+        name: PRINT
+        icon: mdi:printer
+        show_state: false
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.phomemo_t02_print_label
+      - type: button
+        entity: button.phomemo_t02_feed_paper
+        name: Feed
+        icon: mdi:arrow-down-bold-box-outline
+        show_state: false
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.phomemo_t02_feed_paper
