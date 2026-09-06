@@ -138,6 +138,19 @@ python tools/print_test.py print 9C:A8:02:DB:13:95 --text "HELLO" --qr "grocy:p:
   may differ, which is why chunk size and delay are options rather than constants.
 - **Windows paths:** the Bash tool is Git Bash. Python invoked from it needs
   Windows-style paths (`C:\...`), not MSYS `/c/...` paths.
+- **Home Assistant cannot be pip-installed on this dev machine.** `lru-dict`
+  needs MSVC build tools, and HA does not support Windows anyway. To validate HA
+  API usage without installing it, download the wheel and read the source:
+
+  ```bash
+  .venv/Scripts/python.exe -m pip download homeassistant --no-deps \
+      --only-binary=:all: -d <dir>
+  unzip -q <dir>/homeassistant-*.whl -d <src>
+  ```
+
+  Then grep `<src>/homeassistant/...`. Use ripgrep (the Grep tool); a recursive
+  shell `grep` over that tree times out. `pyflakes` catches undefined and unused
+  names across the integration without HA present.
 
 ---
 
