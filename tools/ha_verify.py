@@ -97,18 +97,23 @@ def check_preview_refresh(entities: dict[str, dict]) -> None:
         print(f"   skipped: preview={preview} text={text}")
         return
 
-    before = _get_state(preview)["attributes"].get("entity_picture", "")
+    # An image entity's state IS its image_last_updated timestamp, and that is
+    # what the frontend watches to refetch. entity_picture embeds an access
+    # token that rotates on a timer, not per render, so it is the wrong signal.
+    before = _get_state(preview)["state"]
+    before_mm = _get_state(preview)["attributes"].get("paper_mm")
     new_text = f"verify {int(time.time()) % 10000}"
     _req("POST", "/api/services/text/set_value", {"entity_id": text, "value": new_text})
     time.sleep(2.0)
     after_state = _get_state(preview)
-    after = after_state["attributes"].get("entity_picture", "")
+    after = after_state["state"]
+    after_mm = after_state["attributes"].get("paper_mm")
 
     print(f"   set {text} = {new_text!r}")
-    print(f"   preview entity_picture changed: {before != after}")
-    print(f"   preview paper_mm now: {after_state['attributes'].get('paper_mm')}")
-    if before == after:
-        print("   NOTE: entity_picture token did not change - check image_last_updated")
+    print(f"   image_last_updated advanced: {after != before}  ({before} -> {after})")
+    print(f"   paper_mm re-rendered: {before_mm} -> {after_mm}")
+    if after == before:
+        print("   NOTE: state did not advance - the preview did not re-render")
 
 
 def _get_state(entity_id: str) -> dict:

@@ -8,15 +8,24 @@
       },
       "user": {
         "title": "Add Phomemo T02",
-        "description": "Choose the printer to add. It must be switched on to appear here.",
+        "description": "Choose the printer to add, or enter its address manually. A printer must be switched on to appear in this list.",
         "data": {
           "address": "Printer"
         }
+      },
+      "manual": {
+        "title": "Enter printer address",
+        "description": "Enter the Phomemo T02's Bluetooth address (for example 9C:A8:02:DB:13:95). You can add it even while the printer is asleep; it will show as unavailable until the next print wakes it.",
+        "data": {
+          "address": "Bluetooth address"
+        }
       }
     },
+    "error": {
+      "invalid_address": "That is not a valid Bluetooth address. Use the form AA:BB:CC:DD:EE:FF."
+    },
     "abort": {
-      "already_configured": "This printer is already set up.",
-      "no_devices_found": "No Phomemo T02 was found. Switch the printer on and make sure it is in range of a Bluetooth adapter, or of an ESPHome proxy with active connections enabled."
+      "already_configured": "This printer is already set up."
     }
   },
   "options": {

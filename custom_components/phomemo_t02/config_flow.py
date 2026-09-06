@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import voluptuous as vol
@@ -28,6 +29,10 @@ from .const import (
     DOMAIN,
     LOCAL_NAME,
 )
+
+
+MANUAL_ADDRESS = "manual"
+_MAC_RE = re.compile(r"^([0-9A-F]{2}:){5}[0-9A-F]{2}$")
 
 
 def _is_t02(info: BluetoothServiceInfoBleak) -> bool:
@@ -76,12 +81,9 @@ class PhomemoConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Pick from nearby printers, or enter an address by hand."""
         if user_input is not None:
-            address = user_input[CONF_ADDRESS]
-            await self.async_set_unique_id(address, raise_on_progress=False)
-            self._abort_if_unique_id_configured()
-            return self.async_create_entry(
-                title=f"Phomemo {LOCAL_NAME}", data={CONF_ADDRESS: address}
-            )
+            if user_input[CONF_ADDRESS] == MANUAL_ADDRESS:
+                return await self.async_step_manual()
+            return await self._async_create(user_input[CONF_ADDRESS])
 
         current = self._async_current_ids()
         for info in async_discovered_service_info(self.hass, connectable=True):
@@ -89,12 +91,46 @@ class PhomemoConfigFlow(ConfigFlow, domain=DOMAIN):
                 continue
             self._discovered[info.address] = f"{info.name} ({info.address})"
 
+        # The printer sleeps and stops advertising, so discovery can be empty.
+        # Manual entry is always available rather than a dead end.
         if not self._discovered:
-            return self.async_abort(reason="no_devices_found")
+            return await self.async_step_manual()
 
+        choices = {**self._discovered, MANUAL_ADDRESS: "Enter address manually"}
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): vol.In(self._discovered)}),
+            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): vol.In(choices)}),
+        )
+
+    async def async_step_manual(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Enter the printer's Bluetooth address by hand.
+
+        Useful when the printer is asleep and not currently advertising: the
+        entry is created now and simply reports unavailable until the next print
+        wakes it. The address is validated but not probed here.
+        """
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            address = user_input[CONF_ADDRESS].strip().upper()
+            if not _MAC_RE.match(address):
+                errors["base"] = "invalid_address"
+            else:
+                return await self._async_create(address)
+
+        return self.async_show_form(
+            step_id="manual",
+            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): str}),
+            errors=errors,
+        )
+
+    async def _async_create(self, address: str) -> ConfigFlowResult:
+        """Finalise a config entry for the given address."""
+        await self.async_set_unique_id(address, raise_on_progress=False)
+        self._abort_if_unique_id_configured()
+        return self.async_create_entry(
+            title=f"Phomemo {LOCAL_NAME}", data={CONF_ADDRESS: address}
         )
 
     @staticmethod

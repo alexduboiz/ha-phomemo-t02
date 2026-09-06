@@ -25,7 +25,7 @@ cards:
     entities:
       - entity: text.phomemo_t02_label_text
         name: Text
-      - entity: text.phomemo_t02_label_qr
+      - entity: text.phomemo_t02_qr_data
         name: QR data
       - entity: select.phomemo_t02_font_size
         name: Size

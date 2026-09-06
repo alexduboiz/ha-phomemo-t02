@@ -38,8 +38,10 @@ install it, then restart Home Assistant.
 directory and restart.
 
 Then switch the printer on. It should be discovered automatically under
-**Settings → Devices & services**. If not, add it manually with
-**Add integration → Phomemo T02**.
+**Settings → Devices & services**. If not, use **Add integration → Phomemo T02**
+and either pick it from the list or choose *Enter address manually* and type its
+Bluetooth address (you can add it while it is asleep — it shows as unavailable
+until the next print wakes it).
 
 > The printer must be **powered on** to be discovered or to print. It sleeps to
 > save battery and stops advertising when it does; Home Assistant cannot wake it.
