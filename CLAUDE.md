@@ -132,8 +132,19 @@ python tools/print_test.py print 9C:A8:02:DB:13:95 --text "HELLO" --qr "grocy:p:
 
 ## Gotchas
 
+- **Entity IDs slug from the friendly name, not the entity key.** With
+  `_attr_has_entity_name`, key `label_qr` named "QR data" becomes
+  `text.<device>_qr_data`; translation_key `align` named "Justification" becomes
+  `select.<device>_justification`. Don't guess dashboard entity IDs from the code
+  keys — derive them from display names or read them from a live instance.
+- **The image preview refreshes on the entity's state, not `entity_picture`.**
+  An `ImageEntity`'s state is its `image_last_updated` timestamp, which the
+  frontend watches to refetch. `entity_picture` embeds an access token that
+  rotates on a timer, not per render, so it is the wrong signal to check.
 - **The printer sleeps** and stops advertising. This is the most common runtime
   failure and cannot be fixed in software — the error messages say so explicitly.
+  The config flow has a manual free-text address step so a printer can still be
+  added while asleep (it stays unavailable until the next print wakes it).
 - **Throughput over an ESPHome proxy is lower than local** and the negotiated MTU
   may differ, which is why chunk size and delay are options rather than constants.
 - **Windows paths:** the Bash tool is Git Bash. Python invoked from it needs
